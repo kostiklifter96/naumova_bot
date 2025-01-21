@@ -2,38 +2,31 @@ require("dotenv").config();
 const { Telegraf, Markup } = require("telegraf");
 const { google } = require("googleapis");
 
-// Инициализация бота
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
-// Идентификатор Google-таблицы
 const SPREADSHEET_ID = "1B3NJ25i9g2TkdHsljF7iQgD2EEHlOH1FxmPlEv_squg";
 
-// Настройка Google Sheets API
 const auth = new google.auth.GoogleAuth({
     keyFile: "credentials.json",
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 const sheets = google.sheets({ version: "v4", auth });
 
-// Функция для записи данных в Google-таблицу
 async function saveUserData(user) {
     try {
-        // Чтение существующих данных из таблицы
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId: SPREADSHEET_ID,
-            range: "Лист1!A:A", // Проверяем только колонку A (ID пользователей)
+            range: "Лист1!A:A",
         });
 
         const rows = response.data.values || [];
-        const userIds = rows.flat(); // Преобразуем в плоский массив
+        const userIds = rows.flat();
 
-        // Проверка: есть ли пользователь в таблице
         if (userIds.includes(user.id.toString())) {
             console.log(`Пользователь с ID ${user.id} уже есть в таблице.`);
             return;
         }
 
-        // Если пользователя нет, записываем его данные
         const date = new Date().toISOString();
         const values = [
             [
@@ -57,6 +50,7 @@ async function saveUserData(user) {
         console.error("Ошибка при записи в Google-таблицу:", error);
     }
 }
+
 // === Логика бота ===
 bot.start(async (ctx) => {
     const user = ctx.from;
