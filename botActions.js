@@ -2,11 +2,13 @@ const { Markup } = require("telegraf");
 const { delay } = require("./googleSheetsFunc");
 
 function setupBotActions(bot) {
-    bot.action("FITNESS_PROJECT", async (ctx) => {
-        await ctx.reply(
-            `Мой фитнес-проект - это не марафон, это полноценное обучение питанию,выполнение тренировок и изменение образа жизни.
+    bot.action("FITNESS_PROJECT", (ctx) => {
+        // Запускаем параллельно отправку сообщений и обработку медиа
+        Promise.all([
+            ctx.reply(
+                `Мой фитнес-проект - это не марафон, это полноценное обучение питанию, выполнению тренировок и изменению образа жизни.
 
-10 февраля стартует 16-й поток фитнес-проекта Naumova Team в котором ты сможешь получить:
+10 февраля стартует 16-й поток фитнес-проекта Naumova Team, в котором ты сможешь получить:
 
 ✅ 3 варианта питания на выбор:
 - по меню-конструктору с рассчитанным кБЖУ (60 рецептов)
@@ -14,50 +16,58 @@ function setupBotActions(bot) {
 - меню на 21 день с рассчитанным КБЖУ
 
 ✅ Продуктовую корзину на каждую неделю
-            
 ✅ 9 тренировок на все тело по 30 мин, которые можно выполнять в любое время
-
 ✅ Общий чат с Кариной`,
-            { parse_mode: "HTML" },
-        );
-
-        await delay(3000);
-        await ctx.replyWithMediaGroup([
-            {
-                type: "photo",
-                media: { source: "./assets/images/eat_1.jpg" },
-            },
-            {
-                type: "photo",
-                media: { source: "./assets/images/eat_2.jpg" },
-            },
-            {
-                type: "photo",
-                media: { source: "./assets/images/eat_3.jpg" },
-            },
-        ]);
-
-        await delay(5000);
-        await ctx.reply(
-            "Поспеши, старт потока 10 февраля!\nЦена - 79 BYN 👇",
-            Markup.inlineKeyboard(
-                [
-                    [
-                        Markup.button.url(
-                            "ХОЧУ УЧАСТВОВАТЬ 🔥",
-                            "https://naumova-team.by/?utm_source=telegram&utm_medium=chat_bot&utm_campaign=sryv_knopka_1",
-                        ),
-                    ],
-                    [Markup.button.callback("ЧТО ЕЩЕ ВХОДИТ?", "MORE_INFO")],
-                ],
-                { resize_keyboard: true },
+                { parse_mode: "HTML" },
             ),
+            (async () => {
+                await delay(3000);
+                await ctx.replyWithMediaGroup([
+                    {
+                        type: "photo",
+                        media: { source: "./assets/images/eat_1.jpg" },
+                    },
+                    {
+                        type: "photo",
+                        media: { source: "./assets/images/eat_2.jpg" },
+                    },
+                    {
+                        type: "photo",
+                        media: { source: "./assets/images/eat_3.jpg" },
+                    },
+                ]);
+
+                await delay(5000);
+                await ctx.reply(
+                    "Поспеши, старт потока 10 февраля!\nЦена - 79 BYN 👇",
+                    Markup.inlineKeyboard(
+                        [
+                            [
+                                Markup.button.url(
+                                    "ХОЧУ УЧАСТВОВАТЬ 🔥",
+                                    "https://naumova-team.by/?utm_source=telegram&utm_medium=chat_bot&utm_campaign=sryv_knopka_1",
+                                ),
+                            ],
+                            [
+                                Markup.button.callback(
+                                    "ЧТО ЕЩЕ ВХОДИТ?",
+                                    "MORE_INFO",
+                                ),
+                            ],
+                        ],
+                        { resize_keyboard: true },
+                    ),
+                );
+            })(),
+        ]).catch((err) =>
+            console.error("Ошибка в обработке FITNESS_PROJECT:", err),
         );
     });
 
-    bot.action("MORE_INFO", async (ctx) => {
-        await ctx.reply(
-            `🌟 Зачем ждать ? Время меняться уже настало! 
+    bot.action("MORE_INFO", (ctx) => {
+        Promise.all([
+            ctx.reply(
+                `🌟 Зачем ждать? Время меняться уже настало! 
 
 🔥В фитнес-проекте Naumova Team ты получишь не только доступ к тренировкам и программе питания.
 
@@ -85,51 +95,53 @@ function setupBotActions(bot) {
 
 Посмотри на результаты моих атлетов😍👇
 И знай: у тебя тоже всё получится!`,
-            { parse_mode: "HTML" },
-        );
-
-        await delay(2000);
-        await ctx.replyWithMediaGroup([
-            {
-                type: "photo",
-                media: { source: "./assets/images/change_3.jpg" },
-            },
-        ]);
-
-        await delay(4000);
-        await ctx.reply("А вот что говорят сами атлеты 😍🤗", {
-            parse_mode: "HTML",
-        });
-
-        await delay(2000);
-        await ctx.replyWithMediaGroup([
-            {
-                type: "photo",
-                media: { source: "./assets/images/comment_1.jpg" },
-            },
-        ]);
-
-        await delay(6000);
-        await ctx.reply(
-            "Посвяти 2025 год своему здоровью и красивой фигуре! Старт уже 10 февраля!",
-            Markup.inlineKeyboard(
-                [
-                    [
-                        Markup.button.url(
-                            "ХОЧУ УЧАСТВОВАТЬ 🔥",
-                            "https://naumova-team.by/?utm_source=telegram&utm_medium=chat_bot&utm_campaign=sryv_knopka_2",
-                        ),
-                    ],
-                    [
-                        Markup.button.callback(
-                            "КАК МОЖНО ОПЛАТИТЬ?",
-                            "PAYMENT_INFO",
-                        ),
-                    ],
-                ],
-                { resize_keyboard: true },
+                { parse_mode: "HTML" },
             ),
-        );
+            (async () => {
+                await delay(2000);
+                await ctx.replyWithMediaGroup([
+                    {
+                        type: "photo",
+                        media: { source: "./assets/images/change_3.jpg" },
+                    },
+                ]);
+
+                await delay(4000);
+                await ctx.reply("А вот что говорят сами атлеты 😍🤗", {
+                    parse_mode: "HTML",
+                });
+
+                await delay(2000);
+                await ctx.replyWithMediaGroup([
+                    {
+                        type: "photo",
+                        media: { source: "./assets/images/comment_1.jpg" },
+                    },
+                ]);
+
+                await delay(6000);
+                await ctx.reply(
+                    "Посвяти 2025 год своему здоровью и красивой фигуре! Старт уже 10 февраля!",
+                    Markup.inlineKeyboard(
+                        [
+                            [
+                                Markup.button.url(
+                                    "ХОЧУ УЧАСТВОВАТЬ 🔥",
+                                    "https://naumova-team.by/?utm_source=telegram&utm_medium=chat_bot&utm_campaign=sryv_knopka_2",
+                                ),
+                            ],
+                            [
+                                Markup.button.callback(
+                                    "КАК МОЖНО ОПЛАТИТЬ?",
+                                    "PAYMENT_INFO",
+                                ),
+                            ],
+                        ],
+                        { resize_keyboard: true },
+                    ),
+                );
+            })(),
+        ]).catch((err) => console.error("Ошибка в обработке MORE_INFO:", err));
     });
 
     bot.action("PAYMENT_INFO", async (ctx) => {
@@ -141,13 +153,13 @@ function setupBotActions(bot) {
             const adminId = process.env.ADMIN_ID;
             const user = ctx.from;
             const adminMessage = `
-    👤 Пользователь хочет узнать о способах оплаты:
-    ▪️ Имя: ${user.first_name} ${user.last_name || ""}
-    ▪️ UsernameTelegram: @${user.username || "не указан"}
-    ▪️ InstagramUser: https://www.instagram.com/${
-        nickname.toLowerCase() || "не указан"
-    }
-    ▪️ ID: ${user.id}`;
+👤 Пользователь хочет узнать о способах оплаты:
+▪️ Имя: ${user.first_name} ${user.last_name || ""}
+▪️ UsernameTelegram: @${user.username || "не указан"}
+▪️ InstagramUser: https://www.instagram.com/${
+                nickname.toLowerCase() || "не указан"
+            }
+▪️ ID: ${user.id}`;
 
             try {
                 await ctx.telegram.sendMessage(adminId, adminMessage.trim());
